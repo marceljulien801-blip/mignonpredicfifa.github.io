@@ -1,221 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Mignon Prédic FIFA</title>
-<style>
-  :root{--bg:#f3f6fb;--card:#fff;--muted:#6b7280;--accent:#1f6feb}
-  body{font-family:Inter,system-ui,Arial;margin:0;background:var(--bg);color:#0b1220}
-  .wrap{max-width:820px;margin:18px auto;padding:18px}
-  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 24px rgba(12,30,60,0.06)}
-  h1{margin:0 0 6px;font-size:20px}
-  .muted{color:var(--muted);font-size:13px}
-  label{display:block;margin-top:12px;font-weight:600}
-  input,select,textarea,button{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #e6eef6}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
-  .small{font-size:13px;color:var(--muted)}
-  .result{margin-top:12px;padding:12px;border-radius:8px;background:#0b1220;color:#fff}
-  .tag{display:inline-block;padding:6px 8px;border-radius:8px;background:#eef6ff;color:var(--accent);font-weight:700;margin-right:8px}
-  ol{margin:8px 0 0 18px}
-  .note{font-size:13px;color:var(--muted);margin-top:8px}
-  footer{font-size:12px;color:var(--muted);margin-top:12px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mignon Prédic FIFA</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
+
+  <div class="container">
     <h1>Mignon Prédic FIFA</h1>
-    <div class="muted">Prédicteur virtuel — Formats : <strong>Angleterre 11v11</strong> & <strong>Angleterre 4x4</strong>. Colle un CSV d'historique pour calibrer.</div>
 
-    <label>Nom affiché du site</label>
-    <input id="sitename" value="Mignon Prédic FIFA">
-
-    <label>Format</label>
-    <select id="format">
-      <option value="11v11">Angleterre — Classique (11v11)</option>
-      <option value="4x4">Angleterre — 4x4 (High scoring)</option>
-    </select>
-
-    <div class="row">
-      <div class="col">
-        <label>Équipe A (nom)</label>
-        <input id="teamA" value="Team A">
-        <label class="small">Force offensive A (1→10)</label>
-        <input id="offA" type="range" min="1" max="10" value="6" oninput="offA_val.innerText=this.value"><div class="small">Valeur: <span id="offA_val">6</span></div>
-      </div>
-      <div class="col">
-        <label>Équipe B (nom)</label>
-        <input id="teamB" value="Team B">
-        <label class="small">Force offensive B (1→10)</label>
-        <input id="offB" type="range" min="1" max="10" value="5" oninput="offB_val.innerText=this.value"><div class="small">Valeur: <span id="offB_val">5</span></div>
-      </div>
+    <div class="buttons">
+      <button onclick="predict('classic')">Angleterre Classique</button>
+      <button onclick="predict('fourfour')">Angleterre 4x4</button>
     </div>
 
-    <label class="small">Force défensive A / B (1→10)</label>
-    <div class="row">
-      <div class="col"><input id="defA" type="range" min="1" max="10" value="6" oninput="defA_val.innerText=this.value"><div class="small">A Déf: <span id="defA_val">6</span></div></div>
-      <div class="col"><input id="defB" type="range" min="1" max="10" value="6" oninput="defB_val.innerText=this.value"><div class="small">B Déf: <span id="defB_val">6</span></div></div>
+    <div id="result" class="result-box">
+      Cliquez sur un championnat pour générer une prédiction.
     </div>
-
-    <label>Minute actuelle (0 pré-match)</label>
-    <input id="minute" value="0">
-
-    <label>Historique CSV (optionnel — format : format,home,away,gh,ga,first_min)</label>
-    <textarea id="csv" rows="4" placeholder="Ex: 4x4,City,SmallTown,8,3,1"></textarea>
-
-    <button id="run">Obtenir la prédiction</button>
-
-    <div id="out"></div>
-
-    <div class="note">
-      <strong>Explication des modèles :</strong><br>
-      • 4x4 = modèle haut-scoring (lambda élevé, early goal boost).<br>
-      • 11v11 = modèle bas-scoring (lambda faible, délai du 1er but).<br>
-      • Colle un CSV d’historique réel pour CALIBRER automatiquement les lambdas.
-    </div>
-
-    <footer>Developed for you — Mignon Prédic FIFA. N’utilise pas ce service pour parier sans gestion bankroll & prudence.</footer>
   </div>
-</div>
 
-<script>
-// ---------- utilitaires ----------
-function factorial(n){ return n<=1?1:n*factorial(n-1); }
-function poisson(lam,k){ return Math.exp(-lam)*Math.pow(lam,k)/factorial(k); }
-
-// ---------- calibration depuis CSV simple ----------
-function calibrateCSV(text, fmt, team){
-  // retourne moyenne buts marqués par match pour team et format fmt
-  if(!text) return null;
-  const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  let gf=0, cnt=0;
-  for(const ln of lines){
-    const c = ln.split(',');
-    if(c.length<6) continue;
-    const f = c[0].trim();
-    if(f!==fmt) continue;
-    const home = c[1].trim(), away = c[2].trim();
-    const gh = parseFloat(c[3])||0, ga = parseFloat(c[4])||0;
-    if(home===team){ gf += gh; cnt++; }
-    if(away===team){ gf += ga; cnt++; }
-  }
-  return cnt? (gf/cnt) : null;
-}
-
-// ---------- mapping de clubs populaires (valeurs par défaut) ----------
-const DEFAULT_STRENGTHS = {
-  // gros clubs offensifs typiques pour 4x4
-  'man city':9, 'manchester city':9, 'city':9,
-  'liverpool':9, 'chelsea':8, 'arsenal':8, 'man united':8,
-  'burnley':3, 'bournemouth':3, 'smalltown':3
-};
-
-// ---------- moteur de prédiction ----------
-function compute(format, teamA, teamB, offA, offB, defA, defB, minute, csvText){
-  // normalize names
-  const nameA = teamA.trim().toLowerCase(), nameB = teamB.trim().toLowerCase();
-
-  // if CSV provides mean GF, use it
-  const csvA = calibrateCSV(csvText, format, teamA), csvB = calibrateCSV(csvText, format, teamB);
-
-  let baseA, baseB;
-  if(format==='4x4'){
-    // 4x4: base high
-    // If team in DEFAULT_STRENGTHS use that as offensive rating
-    const offRatingA = csvA || (DEFAULT_STRENGTHS[nameA]||offA);
-    const offRatingB = csvB || (DEFAULT_STRENGTHS[nameB]||offB);
-    // map rating (1-10) to lambda large
-    baseA = 3.5 + (offRatingA-5)*0.9 - (defB-5)*0.3;
-    baseB = 3.5 + (offRatingB-5)*0.9 - (defA-5)*0.3;
-    // apply big club boost if rating >=8
-    if(offRatingA>=8) baseA += 1.5;
-    if(offRatingB>=8) baseB += 1.5;
-    baseA = Math.max(1.5, Math.min(baseA, 14));
-    baseB = Math.max(1.5, Math.min(baseB, 14));
-  } else {
-    // 11v11: low scoring
-    const offRatingA = csvA || (DEFAULT_STRENGTHS[nameA]||offA);
-    const offRatingB = csvB || (DEFAULT_STRENGTHS[nameB]||offB);
-    baseA = 0.85 + (offRatingA-5)*0.12 - (defB-5)*0.14;
-    baseB = 0.85 + (offRatingB-5)*0.12 - (defA-5)*0.14;
-    baseA = Math.max(0.15, Math.min(baseA, 4));
-    baseB = Math.max(0.15, Math.min(baseB, 4));
-  }
-
-  // adjust for minute remaining (assume 90 total)
-  minute = Number(minute)||0; if(minute<0) minute=0; if(minute>90) minute=90;
-  const prop = (90-minute)/90;
-  let lamA = baseA * prop, lamB = baseB * prop;
-
-  // For 4x4 enforce early-goal behavior: if minute small, boost probability of >=1 goal
-  if(format==='4x4' && minute<5){
-    // ensure lambda reflects early-goals: scale a bit up
-    lamA *= 1.05 + (5-minute)/30;
-    lamB *= 1.05 + (5-minute)/30;
-  }
-  // For 11v11 and minute small (<20) slightly delay scoring (reduce lambda)
-  if(format==='11v11' && minute<20){
-    lamA *= 0.85 + minute/60;
-    lamB *= 0.85 + minute/60;
-  }
-
-  // choose max goals to enumerate
-  const maxG = format==='4x4'? 12 : 5;
-
-  // compute table
-  const table = {};
-  let sum=0;
-  for(let i=0;i<=maxG;i++){
-    const ph = poisson(lamA,i);
-    for(let j=0;j<=maxG;j++){
-      const pa = poisson(lamB,j);
-      const key = `${i}-${j}`;
-      const p = ph*pa;
-      table[key]=p;
-      sum += p;
-    }
-  }
-  // normalization (numeric)
-  for(const k in table) table[k]=table[k]/sum;
-
-  // prepare top list
-  const top = Object.entries(table).sort((a,b)=>b[1]-a[1]).slice(0,8);
-
-  // extra metrics
-  const expectedTotal = Object.entries(table).reduce((s,[k,v])=>{
-    const [a,b]=k.split('-').map(x=>parseInt(x));
-    return s + (a+b)*v;
-  },0);
-
-  return {lamA, lamB, top, table, expectedTotal, baseA, baseB};
-}
-
-// ---------- UI ----------
-document.getElementById('run').addEventListener('click',()=>{
-  const fmt = document.getElementById('format').value;
-  const teamA = document.getElementById('teamA').value||'Team A';
-  const teamB = document.getElementById('teamB').value||'Team B';
-  const offA = Number(document.getElementById('offA').value||6);
-  const offB = Number(document.getElementById('offB').value||5);
-  const defA = Number(document.getElementById('defA').value||6);
-  const defB = Number(document.getElementById('defB').value||6);
-  const minute = Number(document.getElementById('minute').value||0);
-  const csv = document.getElementById('csv').value||'';
-
-  const res = compute(fmt, teamA, teamB, offA, offB, defA, defB, minute, csv);
-
-  let html = `<div class="result"><div><span class="tag">${fmt}</span> ${teamA} vs ${teamB}</div>`;
-  html += `<div class="small">Lambda ajustés: ${teamA}: ${res.lamA.toFixed(2)} — ${teamB}: ${res.lamB.toFixed(2)} | Espérance buts: ${res.expectedTotal.toFixed(2)}</div>`;
-  html += `<hr style="margin:8px 0">`;
-  html += `<strong>Top prédictions</strong><ol>`;
-  for(const [score,p] of res.top){
-    html += `<li style="margin:6px 0">${score} — ${(p*100).toFixed(2)}%</li>`;
-  }
-  html += `</ol><div class="small">Conseil: ${fmt==='4x4' ? 'Privilégier Over/Totals (Over 4.5, 5.5...)' : 'Privilégier Exact score bas (0-1 / 1-0 / 1-1) si confiance élevée.'}</div></div>`;
-  document.getElementById('out').innerHTML = html;
-});
-</script>
+  <script src="script.js"></script>
 </body>
-  </html>
+</html>
