@@ -1,0 +1,31 @@
+{
+  "classic": [
+    {
+      "team1": "Arsenal",
+      "team2": "Liverpool",
+      "score": "1-0",
+      "comment": "Match serré, but tardif."
+    },
+    {
+      "team1": "Chelsea",
+      "team2": "Tottenham",
+      "score": "1-1",
+      "comment": "Très équilibré."
+    }
+  ],
+
+  "fourfour": [
+    {
+      "team1": "Man City",
+      "team2": "Chelsea",
+      "score": "6-4",
+      "comment": "Début rapide, beaucoup de buts."
+    },
+    {
+      "team1": "Liverpool",
+      "team2": "Arsenal",
+      "score": "7-3",
+      "comment": "Premier but très rapide."
+    }
+  ]
+}
