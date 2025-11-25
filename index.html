@@ -1,31 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mignon Prédic FIFA</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mignon Prédic FIFA</title>
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+
+    .box {
+        background: white;
+        width: 90%;
+        max-width: 380px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    select, input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background: #005ec2;
+    }
+
+    #result {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+</head>
 <body>
 
-    <div class="container">
+<div class="box">
+    <h1>⚽ Prédictions FIFA</h1>
+    <p>Choisis ton format et les équipes</p>
 
-        <h2>🔮 Prédictions FIFA</h2>
-        <p class="subtitle">FIFA 4x4 • Championnat d'Angleterre</p>
+    <select id="format">
+        <option value="4x4">FIFA 4x4 Championnat d'Angleterre</option>
+        <option value="11v11">FIFA Classique 11v11</option>
+    </select>
 
-        <div class="input-group">
-            <input type="text" id="teamA" placeholder="Équipe A ici">
-            <input type="text" id="teamB" placeholder="Équipe B ici">
-        </div>
+    <input id="teamA" placeholder="Équipe A ici">
+    <input id="teamB" placeholder="Équipe B ici">
 
-        <button id="predictBtn">Obtenir la prédiction</button>
+    <button onclick="predict()">Obtenir la prédiction !</button>
 
-        <p id="result"></p>
+    <div id="result"></div>
+</div>
 
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
