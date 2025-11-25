@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mignon Prédic FIFA</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mignon Prédic FIFA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>Mignon Prédic FIFA</h1>
+    <div class="container">
 
-    <div class="buttons">
-      <button onclick="predict('classic')">Angleterre Classique</button>
-      <button onclick="predict('fourfour')">Angleterre 4x4</button>
+        <h2>🔮 Prédictions FIFA</h2>
+        <p class="subtitle">FIFA 4x4 • Championnat d'Angleterre</p>
+
+        <div class="input-group">
+            <input type="text" id="teamA" placeholder="Équipe A ici">
+            <input type="text" id="teamB" placeholder="Équipe B ici">
+        </div>
+
+        <button id="predictBtn">Obtenir la prédiction</button>
+
+        <p id="result"></p>
+
     </div>
 
-    <div id="result" class="result-box">
-      Cliquez sur un championnat pour générer une prédiction.
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
