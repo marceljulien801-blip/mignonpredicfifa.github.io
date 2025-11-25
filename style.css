@@ -1,44 +1,79 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f3f3f3;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #0a2a43, #063250);
+    color: white;
+    height: 100vh;
 }
 
 .container {
-  text-align: center;
-  margin-top: 40px;
+    width: 92%;
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
+    text-align: center;
 }
 
-h1 {
-  color: #222;
-  font-size: 28px;
-  margin-bottom: 25px;
+h2 {
+    margin-bottom: 8px;
+    font-size: 26px;
+    font-weight: 700;
 }
 
-.buttons button {
-  background: #007BFF;
-  color: white;
-  padding: 15px 25px;
-  margin: 10px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
+.subtitle {
+    font-size: 15px;
+    color: #cfd9df;
+    margin-bottom: 25px;
 }
 
-.buttons button:hover {
-  background: #0056c7;
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.result-box {
-  margin-top: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 0 0 10px #ccc;
-  font-size: 18px;
+input {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+input::placeholder {
+    color: #e8e8e8;
+}
+
+button {
+    padding: 14px;
+    width: 100%;
+    background: #00c851;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.25s;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #00993b;
+    transform: scale(1.03);
+}
+
+#result {
+    margin-top: 25px;
+    font-size: 19px;
+    font-weight: bold;
+    color: #ffe082;
+    white-space: pre-line;
 }
